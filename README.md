@@ -1,4 +1,4 @@
-# CoffeeShopAPI
+# CoffeeShopAPI - Scenario 2
 
 This application make use ASP.Net Core Web API to create a library of RESTful endpoints that allow users to access information about coffee beans. I decided to choose ASP.Net Core as it has been a framework that I have always enjoyed using and developing in and for the past 3 years this is something I have been unable  do.
 
