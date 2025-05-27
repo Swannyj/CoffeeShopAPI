@@ -6,6 +6,7 @@ using CoffeeShopAPI.Models;
 using CoffeeShopAPI.Models.RequestTypes;
 using CoffeeShopAPI.Models.ResponseTypes;
 using CoffeeShopAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -47,6 +48,7 @@ namespace CoffeeShopAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetAsync")]
+        [Authorize(AuthenticationSchemes = "BasicAuthentication")]
         public async Task<IActionResult> GetAsync()
         {
             try
@@ -73,6 +75,7 @@ namespace CoffeeShopAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete("DeleteAllCoffeeBeansAsync")]
+        [Authorize(AuthenticationSchemes = "BasicAuthentication")]
         public async Task<IActionResult> DeleteAllCoffeeBeansAsync()
         {
             try
@@ -101,6 +104,7 @@ namespace CoffeeShopAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("LoadInitialDataAsync")]
+        [Authorize(AuthenticationSchemes = "BasicAuthentication")]
         public async Task<IActionResult> LoadInitialDataAsync()
         {
             try
@@ -129,6 +133,7 @@ namespace CoffeeShopAPI.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InsertCoffeeBeanAsync")]
+        [Authorize(AuthenticationSchemes = "BasicAuthentication")]
         public async Task<IActionResult> InsertCoffeeBeanAsync(InsertCoffeeBeanRequest request)
         {
             string pattern = @"^[^\d\s]{1}\d+(\.\d{2})$";
@@ -165,6 +170,7 @@ namespace CoffeeShopAPI.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut("UpdateCoffeeBeanAsync")]
+        [Authorize(AuthenticationSchemes = "BasicAuthentication")]
         public async Task<IActionResult> UpdateCoffeeBeanAsync(UpdateCoffeeBeanRequest request)
         {
             string pattern = @"^[^\d\s]{1}\d+(\.\d{2})$";
@@ -201,6 +207,7 @@ namespace CoffeeShopAPI.Controllers
         /// <param name="service"></param>
         /// <returns></returns>
         [HttpPost("Test-BOTD")]
+        [Authorize(AuthenticationSchemes = "BasicAuthentication")]
         public async Task<IActionResult> TestBOTD([FromServices] BOTDService service)
         {
             try
@@ -223,6 +230,7 @@ namespace CoffeeShopAPI.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet("search")]
+        [Authorize(AuthenticationSchemes = "BasicAuthentication")]
         public async Task<IActionResult> Search([FromQuery] SearchCoffeeBeansRequest request)
         {
             try
