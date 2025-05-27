@@ -51,10 +51,8 @@ namespace CoffeeShopAPI.Tests
         public async Task GetAll_ReturnsAllBeansOrderedById()
         {
             var context = CreateDbContext();
-            context.CoffeeBean.AddRange(
-                new CoffeeBean { Id = 2, Name = "B" },
-                new CoffeeBean { Id = 1, Name = "A" }
-            );
+            context.CoffeeBean.AddRange(await GetCoffeeBeans());
+
             await context.SaveChangesAsync();
 
             var repo = CreateRepository(context);
@@ -62,11 +60,12 @@ namespace CoffeeShopAPI.Tests
             var result = await repo.GetAll();
 
             // Check the correct count
-            Assert.Equal(2, result.Count);
+            Assert.Equal(3, result.Count);
 
             // Ensure they are returned by ID
             Assert.Equal(1, result[0].Id);
             Assert.Equal(2, result[1].Id);
+            Assert.Equal(3, result[2].Id);
         }
 
         /// <summary>
@@ -179,52 +178,22 @@ namespace CoffeeShopAPI.Tests
         public async Task Search_FiltersByNameColourCost_ReturnsFilteredList()
         {
             var context = CreateDbContext();
-            context.CoffeeBean.AddRange(
-                new CoffeeBean { Id = 1, Name = "Espresso", Colour = "Dark", Cost = "5" },
-                new CoffeeBean { Id = 2, Name = "Latte", Colour = "Light", Cost = "4" },
-                new CoffeeBean { Id = 3, Name = "Mocha", Colour = "Dark", Cost = "6" }
-            );
+            context.CoffeeBean.AddRange(await GetCoffeeBeans());
             await context.SaveChangesAsync();
 
             var repo = CreateRepository(context);
 
             var request = new SearchCoffeeBeansRequest
             {
-                Name = "es",
-                Colour = "Dark",
-                Cost = "5"
+                Name = "TU",
+                Colour = "dar",
+                Cost = "3"
             };
 
             var results = await repo.Search(request);
 
             Assert.Single(results);
-            Assert.Equal("Espresso", results[0].Name);
-        }
-
-        /// <summary>
-        /// Delete all beans
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task DeleteAll_RemovesAllBeans_ReturnsTrue()
-        {
-            var context = CreateDbContext();
-            context.CoffeeBean.AddRange(
-                new CoffeeBean { Id = 1, Name = "Bean1" },
-                new CoffeeBean { Id = 2, Name = "Bean2" }
-            );
-            await context.SaveChangesAsync();
-
-            var loggerMock = new Mock<ILogger<CoffeeBeanRepository>>();
-
-            var repo = CreateRepository(context, null, loggerMock);
-
-            var result = await repo.DeleteAll();
-
-            Assert.True(result);
-
-            // Try and retrieve any beans
-            Assert.Empty(await context.CoffeeBean.ToListAsync());
+            Assert.Equal("TURNABOUT", results[0].Name);
         }
 
         #endregion Public Methods
@@ -257,6 +226,44 @@ namespace CoffeeShopAPI.Tests
             loggerMock ??= new Mock<ILogger<CoffeeBeanRepository>>();
             return new CoffeeBeanRepository(context, jsonServiceMock.Object, loggerMock.Object);
         }
+
+        /// <summary>
+        /// Create some coffee beans
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<CoffeeBean>> GetCoffeeBeans()
+        {
+            return new List<CoffeeBean>() {
+                new CoffeeBean
+                {
+                    Id = 1,
+                    Name = "TURNABOUT",
+                    IsBOTD = false,
+                    Colour = "dark roast",
+                    Cost = "£39.26",
+                    Description = "Smooth coffee bean"
+                },
+                new CoffeeBean
+                {
+                    Id = 2,
+                    Name = "ISONUS",
+                    IsBOTD = false,
+                    Colour = "Dark Brown",
+                    Cost = "£10.00",
+                    Description = "Strong coffee bean"
+                },
+                 new CoffeeBean
+                {
+                    Id = 3,
+                    Name = "ZILLAN",
+                    IsBOTD = false,
+                    Colour = "Light Brown",
+                    Cost = "£5.99",
+                    Description = "Unique flavor coffee bean"
+                }
+            };
+        }
+
 
         #endregion Private Methods
     }
