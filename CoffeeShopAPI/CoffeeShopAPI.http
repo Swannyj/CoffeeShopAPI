@@ -1,0 +1,6 @@
+@CoffeeShopAPI_HostAddress = http://localhost:5093
+
+GET {{CoffeeShopAPI_HostAddress}}/coffeebeanapi/
+Accept: application/json
+
+###
