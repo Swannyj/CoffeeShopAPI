@@ -33,49 +33,6 @@ namespace CoffeeShopAPI.Services
         #region Public Methods
 
         /// <summary>
-        /// Execute Async
-        /// Execute the background service at midnight every night
-        /// </summary>
-        /// <param name="stoppingToken"></param>
-        /// <returns></returns>
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-
-                using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-                try
-                {
-                    // attempt to select a bean
-                    await SelectBeanOfTheDayAsync(dbContext);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to select Bean of the Day.");
-                }
-
-                // Calculate delay until next midnight
-                var now = DateTime.Now;
-                var nextMidnight = now.Date.AddDays(1); // midnight of next day
-                var delay = nextMidnight - now;
-
-                _logger.LogInformation($"Waiting {delay} until next execution at midnight.");
-
-                try
-                {
-                    await Task.Delay(delay, stoppingToken);
-                }
-                catch (TaskCanceledException)
-                {
-                    // The delay was cancelled
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
         /// Select the bean of the day
         /// </summary>
         /// <param name="dbContext"></param>
@@ -114,7 +71,65 @@ namespace CoffeeShopAPI.Services
             Console.WriteLine($"Bean of the Day: {randomBean.Name}");
         }
 
+        /// <summary>
+        /// Return and calcuate the time until midnight
+        /// </summary>
+        /// <param name="now"></param>
+        /// <returns></returns>
+        public TimeSpan CalculateDelayUntilNextMidnight(DateTime now)
+        {
+            var nextMidnight = now.Date.AddDays(1);
+            return nextMidnight - now;
+        }
+
         #endregion Public Methods
+
+        #region Protected Methods
+
+        /// <summary>
+        /// Execute Async
+        /// Execute the background service at midnight every night
+        /// </summary>
+        /// <param name="stoppingToken"></param>
+        /// <returns></returns>
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+
+                using var scope = _scopeFactory.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                try
+                {
+                    // attempt to select a bean
+                    await SelectBeanOfTheDayAsync(dbContext);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to select Bean of the Day.");
+                }
+
+                // Calculate delay until next midnight
+                var now = DateTime.Now;
+                var nextMidnight = now.Date.AddDays(1); // midnight of next day
+                var delay = CalculateDelayUntilNextMidnight(DateTime.Now);
+
+                _logger.LogInformation($"Waiting {delay} until next execution at midnight.");
+
+                try
+                {
+                    await Task.Delay(delay, stoppingToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    // The delay was cancelled
+                    break;
+                }
+            }
+        }
+
+        #endregion Protected Methods
     }
 
 }
